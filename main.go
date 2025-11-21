@@ -8,15 +8,14 @@ import (
     "syscall"
     "time"
 
-    "github.com/yourusername/task_manager/data"
-    "Task_manager -API/router"
+    "github.com/haju35/TaskManager-API/data"
+    "github.com/haju35/TaskManager-API/router"
 )
 
 func main() {
-    // Load configuration from env vars
+    // Load configuration from environment variables
     mongoURI := os.Getenv("MONGO_URI")
     if mongoURI == "" {
-        // fallback to local default for convenience, but recommend setting env var in production
         mongoURI = "mongodb://localhost:27017"
     }
     dbName := os.Getenv("MONGO_DB")
@@ -32,23 +31,17 @@ func main() {
         port = "8080"
     }
 
-    // init mongo
+    // Initialize MongoDB
     log.Printf("Connecting to MongoDB: %s (db=%s, collection=%s)\n", mongoURI, dbName, collName)
-    ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-    defer cancel()
-    if err := data.InitMongo(ctx, mongoURI, dbName, collName); err != nil {
+    if err := data.InitMongo(mongoURI, dbName, collName); err != nil {
         log.Fatalf("Failed to connect to MongoDB: %v\n", err)
     }
-    defer func() {
-        // graceful disconnect
-        if err := data.DisconnectMongo(context.Background()); err != nil {
-            log.Printf("Error disconnecting MongoDB: %v\n", err)
-        }
-    }()
 
+
+    // Setup router
     r := router.SetupRouter()
 
-    // run server in goroutine
+    // Start server in a goroutine
     srvAddr := ":" + port
     go func() {
         if err := r.Run(srvAddr); err != nil {
@@ -57,16 +50,16 @@ func main() {
     }()
     log.Printf("Server running on %s\n", srvAddr)
 
-    // wait for termination signals for graceful shutdown
+    // Wait for termination signals for graceful shutdown
     quit := make(chan os.Signal, 1)
     signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
     <-quit
     log.Println("Shutting down server...")
 
-    // optional: give some time for graceful shutdown
-    timeoutCtx, timeoutCancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer timeoutCancel()
+    // Optional: give some time for graceful shutdown
+    timeoutCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
     _ = timeoutCtx
-    // since gin.Run uses http.ListenAndServe, a full graceful shutdown needs extra wiring if desired.
-    // For now we ensure the app disconnects from mongo in defer and exit.
+
+    log.Println("Server stopped")
 }

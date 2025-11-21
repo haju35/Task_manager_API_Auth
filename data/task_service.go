@@ -5,7 +5,7 @@ import (
     "errors"
     "time"
 
-    "Task_manager/models"
+    "github.com/haju35/TaskManager-API/models"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo"
@@ -16,10 +16,6 @@ var (
     TasksCollection *mongo.Collection
     mongoClient     *mongo.Client
 )
-
-// ---------------------------
-// MongoDB Initialization
-// ---------------------------
 
 func InitMongo(uri, dbName, collectionName string) error {
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -87,10 +83,6 @@ func Create(t models.Task) (*models.Task, error) {
     ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
     defer cancel()
 
-    // assign ID if missing (for backward compatibility)
-    if t.ID == "" {
-        t.ID = primitive.NewObjectID()
-    }
 
     _, err := TasksCollection.InsertOne(ctx, t)
     if err != nil {

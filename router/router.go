@@ -2,9 +2,7 @@ package router
 
 import (
     "github.com/gin-gonic/gin"
-    "Task_manager -API/controllers"
-    "Task_manager/data"
-
+    "github.com/haju35/TaskManager-API/controllers"
 )
 
 func SetupRouter() *gin.Engine {
