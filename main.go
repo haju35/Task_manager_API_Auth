@@ -8,8 +8,8 @@ import (
     "syscall"
     "time"
 
-    "github.com/haju35/Task_Manager-API_Auth/data"
-    "github.com/haju35/Task_Manager-API_Auth/router"
+    "github.com/haju35/Task_manager_API_Auth/data"
+    "github.com/haju35/Task_manager_API_Auth/router"
 )
 
 func main() {

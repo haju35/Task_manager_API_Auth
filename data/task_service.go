@@ -5,7 +5,7 @@ import (
     "errors"
     "time"
 
-    "github.com/haju35/TaskManager-API/models"
+    "github.com/haju35/Task_manager_API_Auth/models"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo"
