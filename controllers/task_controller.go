@@ -92,3 +92,61 @@ func DeleteTaskHandler(c *gin.Context) {
 
     c.JSON(http.StatusNoContent, gin.H{})
 }
+
+
+
+func RegisterHandler(c *gin.Context) {
+var body struct {
+Username string `json:"username" binding:"required"`
+Password string `json:"password" binding:"required"`
+}
+if err := c.ShouldBindJSON(&body); err != nil {
+c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+return
+}
+u, err := data.CreateUser(body.Username, body.Password)
+if err != nil {
+c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+return
+}
+// don't return password
+u.Password = ""
+c.JSON(http.StatusCreated, gin.H{"user": u})
+}
+
+
+func LoginHandler(c *gin.Context) {
+var body struct {
+Username string `json:"username" binding:"required"`
+Password string `json:"password" binding:"required"`
+}
+if err := c.ShouldBindJSON(&body); err != nil {
+c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+return
+}
+user, err := data.Authenticate(body.Username, body.Password)
+if err != nil {
+c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+return
+}
+// create token
+token, err := middleware.TokenFromUser(user)
+if err != nil {
+c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create token"})
+return
+}
+c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+
+func PromoteHandler(c *gin.Context) {
+// only admin can call (router ensures RequireRole)
+idStr := c.Param("id")
+id, err := strconv.Atoi(idStr)
+if err != nil {
+c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+return
+}
+u.Password = ""
+c.JSON(http.StatusOK, gin.H{"user": u})
+}
